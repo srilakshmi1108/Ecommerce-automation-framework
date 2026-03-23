@@ -1,0 +1,103 @@
+package com.ecommerce.runner;
+
+import com.ecommerce.pages.LoginPageActions;
+import com.ecommerce.pages.ProductsPageActions;
+import com.ecommerce.pages.CartPageActions;
+import com.ecommerce.pages.CheckoutPageActions;
+import com.ecommerce.utils.Base;
+import com.ecommerce.utils.Reporter;
+import com.ecommerce.utils.Screenshot;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+
+public class CheckoutTest extends Base {
+
+    LoginPageActions loginAct;
+    ProductsPageActions productsAct;
+    CartPageActions cartAct;
+    CheckoutPageActions checkoutAct;
+
+    @BeforeMethod
+    public void setup() {
+        openBrowser();
+        loginAct = new LoginPageActions(driver);
+        productsAct = new ProductsPageActions(driver);
+        cartAct = new CartPageActions(driver);
+        checkoutAct = new CheckoutPageActions(driver);
+
+        // Login before every checkout test
+        loginAct.login("standard_user", "secret_sauce");
+    }
+
+    @AfterMethod
+    public void teardown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    // Test 1 — Complete Checkout Flow
+
+    @Test(priority = 1, description = "Verifying complete checkout flow from end to end")
+    public void testCompleteCheckout() {
+        Reporter.createTest("testCompleteCheckout");
+        try {
+            // Step 1 — Add to cart
+            productsAct.addToCart();
+            Reporter.info("Product added to cart.");
+
+            // Step 2 — Go to cart
+            productsAct.clickCartIcon();
+            Reporter.info("Navigated to cart.");
+
+            // Step 3 — Click checkout
+            cartAct.clickCheckout();
+            Reporter.info("Clicked checkout button.");
+
+            // Step 4 — Fill checkout details
+            checkoutAct.fillCheckoutDetails("Sri", "Lakshmi", "500001");
+            Reporter.info("Checkout details filled.");
+
+            // Step 5 — Verify total and finish
+            String total = checkoutAct.getTotalPrice();
+            Reporter.info("Order total: " + total);
+            checkoutAct.clickFinish();
+
+            // Step 6 — Verify success
+            Assert.assertTrue(checkoutAct.isOrderSuccessful(),
+                    "Order success message is not displayed");
+
+            String successMsg = checkoutAct.getSuccessHeader();
+            Assert.assertEquals(successMsg, "Thank you for your order",
+                    "Success message mismatched");
+
+            Reporter.pass("Checkout completed successfully! Message: " + successMsg);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testCompleteCheckout");
+            Reporter.fail("Checkout FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+
+
+    //  Test 2 — Verifying Product Sorting
+
+    @Test(priority = 2, description = "Verifying products are sorted by Price low to high")
+    public void testProductSorting() {
+        Reporter.createTest("testProductSorting");
+        try {
+            productsAct.selectSortOption("Price (low to high)");
+
+            Reporter.pass("Sort option selected: Price (low to high)");
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testProductSorting");
+            Reporter.fail("Product sorting FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+}
