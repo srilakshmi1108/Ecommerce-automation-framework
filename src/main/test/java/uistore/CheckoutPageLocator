@@ -1,0 +1,16 @@
+package com.ecommerce.uistore;
+
+import org.openqa.selenium.By;
+
+public class CheckoutPageLocator {
+    public static By firstName = By.id("first-name");
+    public static By lastName = By.id("last-name");
+    public static By zipCode = By.id("postal-code");
+    public static By continueBtn = By.id("continue");
+    public static By cancelBtn = By.id("cancel");
+    public static By totalPrice = By.className("summary_total_label");
+    public static By finishBtn = By.id("finish");
+    public static By successHeader = By.className("complete-header");
+    public static By successMessage = By.className("complete-text");
+    public static By backHomeBtn = By.id("back-to-products");
+}
