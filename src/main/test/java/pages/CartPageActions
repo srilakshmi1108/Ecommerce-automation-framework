@@ -1,0 +1,45 @@
+package com.ecommerce.pages;
+
+import com.ecommerce.utils.WebDriverHelper;
+import com.ecommerce.uistore.CartPageLocator;
+import org.openqa.selenium.WebDriver;
+
+
+public class CartPageActions {
+
+    public static WebDriver driver;
+    public WebDriverHelper helper;
+
+    public CartPageActions(WebDriver driver) {
+        this.driver = driver;
+        helper = new WebDriverHelper(driver);
+    }
+    
+    public String getPageTitle() {
+        return helper.getText(CartPageLocator.pageTitle);
+    }
+    
+    public String getCartItemName() {
+        return helper.getText(CartPageLocator.cartItemName);
+    }
+    
+    public String getCartItemPrice() {
+        return helper.getText(CartPageLocator.cartItemPrice);
+    }
+    
+    public void clickRemove() {
+        helper.click(CartPageLocator.removeBtn);
+    }
+    
+    public boolean isCartItemDisplayed() {
+        return helper.isDisplayed(CartPageLocator.cartItemName);
+    }
+    
+    public void clickContinueShopping() {
+        helper.click(CartPageLocator.continueShoppingBtn);
+    }
+    
+    public void clickCheckout() {
+        helper.click(CartPageLocator.checkoutBtn);
+    }
+}
