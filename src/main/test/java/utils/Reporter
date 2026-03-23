@@ -1,0 +1,64 @@
+package com.ecommerce.utils;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+public class Reporter {
+    
+    private static ExtentReports extent;
+    private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
+    
+    public static void initReports() {
+        String reportPath = PropertyUtils.get("reportsPath") + "AutomationReport.html";
+        ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
+        sparkReporter.config().setTheme(Theme.DARK);
+        sparkReporter.config().setDocumentTitle("Ecommerce Automation Report");
+        sparkReporter.config().setReportName("Saucedemo Test Results");
+        sparkReporter.config().setTimeStampFormat("yyyy-MM-dd HH:mm:ss");
+        extent = new ExtentReports();
+        extent.attachReporter(sparkReporter);
+        extent.setSystemInfo("Application", "Saucedemo");
+        extent.setSystemInfo("Environment", "QA");
+        extent.setSystemInfo("Browser", PropertyUtils.get("browser"));
+        extent.setSystemInfo("Tester", "Srilakshmi");
+
+        LoggerHandler.info("Extent Reports initialized: " + reportPath);
+    }
+
+    public static void flushReports() {
+        if (extent != null) {
+            extent.flush();
+            LoggerHandler.info("Extent Reports flushed to disk");
+        }
+    }
+    
+    public static void createTest(String testName) {
+        ExtentTest extentTest = extent.createTest(testName);
+        test.set(extentTest);
+        LoggerHandler.info("Test started: " + testName);
+    }
+
+    public static ExtentTest getTest() {
+        return test.get();
+    }
+
+    public static void pass(String message) {
+        test.get().pass(message);
+        LoggerHandler.info("PASS: " + message);
+    }
+
+    public static void fail(String message, String screenshotPath) {
+        test.get().fail(message);
+        if (screenshotPath != null) {
+            test.get().addScreenCaptureFromPath(screenshotPath, "Failure Screenshot");
+        }
+        LoggerHandler.error("FAIL: " + message);
+    }
+
+    public static void info(String message) {
+        test.get().info(message);
+        LoggerHandler.info("INFO: " + message);
+    }
+}
