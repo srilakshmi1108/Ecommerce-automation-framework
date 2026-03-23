@@ -1,0 +1,119 @@
+package com.ecommerce.utils;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+
+import java.time.Duration;
+import java.util.NoSuchElementException;
+
+public class WebDriverHelper {
+
+    private WebDriver driver;
+    private FluentWait<WebDriver> wait;
+    public WebDriverHelper(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(15))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class);
+    }
+    
+    public void sendKeys(By locator, String text) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(locator)
+            );
+            element.clear();
+            element.sendKeys(text);
+            LoggerHandler.info("Typed '" + text + "' into: " + locator);
+        } catch (Exception e) {
+            LoggerHandler.error("sendKeys FAILED for: " + locator + " | " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    public void click(By locator) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.elementToBeClickable(locator)
+            );
+            element.click();
+            LoggerHandler.info("Clicked: " + locator);
+        } catch (Exception e) {
+            LoggerHandler.error("click FAILED for: " + locator + " | " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    public String getText(By locator) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(locator)
+            );
+            String text = element.getText();
+            LoggerHandler.info("Got text '" + text + "' from: " + locator);
+            return text;
+        } catch (Exception e) {
+            LoggerHandler.error("getText FAILED for: " + locator + " | " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    public void selectDropDown(By locator, String visibleText) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(locator)
+            );
+            new Select(element).selectByVisibleText(visibleText);
+            LoggerHandler.info("Selected '" + visibleText + "' from: " + locator);
+        } catch (Exception e) {
+            LoggerHandler.error("selectDropDown FAILED for: " + locator + " | " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    public void scrollTo(By locator) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.presenceOfElementLocated(locator)
+            );
+            ((JavascriptExecutor) driver)
+                    .executeScript("arguments[0].scrollIntoView(true);", element);
+            LoggerHandler.info("Scrolled to: " + locator);
+        } catch (Exception e) {
+            LoggerHandler.error("scrollTo FAILED for: " + locator + " | " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    public boolean isDisplayed(By locator) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(locator)
+            );
+            return element.isDisplayed();
+        } catch (Exception e) {
+            LoggerHandler.info("isDisplayed → false for: " + locator);
+            return false;
+        }
+    }
+    
+    public String getAttribute(By locator, String attribute) {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(locator)
+            );
+            String value = element.getAttribute(attribute);
+            LoggerHandler.info("Got attribute '" + attribute + "' = '" + value + "' from: " + locator);
+            return value;
+        } catch (Exception e) {
+            LoggerHandler.error("getAttribute FAILED for: " + locator + " | " + e.getMessage());
+            throw e;
+        }
+    }
+}
