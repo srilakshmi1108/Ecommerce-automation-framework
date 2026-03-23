@@ -1,0 +1,61 @@
+package com.ecommerce.utils;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.WebDriverListener;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+
+import java.net.URL;
+import java.time.Duration;
+
+public class Base {
+
+
+    public static WebDriver driver;
+    public void openBrowser() {
+        try {
+    
+            String remoteUrl = PropertyUtils.get("remoteUrl");
+            String appUrl    = PropertyUtils.get("atUrl");
+            ChromeOptions options = new ChromeOptions();
+            driver = new RemoteWebDriver(new URL(remoteUrl), options);
+            driver.manage().window().maximize();
+
+            // Implicit wait — waits up to 10s before throwing NoSuchElementException
+            driver.manage().timeouts().implicitlyWait(
+                    Duration.ofSeconds(Long.parseLong(PropertyUtils.get("implicitWait")))
+            );
+
+            //  Page load timeout — waits up to 15s for page to fully load
+            driver.manage().timeouts().pageLoadTimeout(
+                    Duration.ofSeconds(Long.parseLong(PropertyUtils.get("pageLoadTimeout")))
+            );
+
+            //  Wrap driver with EventFiringDecorator this makes EventHandler methods fire automatically
+            WebDriverListener listener = new EventHandler();
+            driver = new EventFiringDecorator<>(listener).decorate(driver);
+            LoggerHandler.info("Browser launched. Connected to grid: " + remoteUrl);
+            driver.get(appUrl);
+
+        } catch (Exception e) {
+            LoggerHandler.error("openBrowser() failed: " + e.getMessage());
+            throw new RuntimeException("Browser launch failed: " + e.getMessage(), e);
+        }
+    }
+
+    @BeforeSuite
+    public void suiteSetup() {
+        Reporter.initReports();
+        LoggerHandler.info("");
+    }
+
+
+    @AfterSuite
+    public void suiteTeardown() {
+        Reporter.flushReports();
+        LoggerHandler.info("");
+    }
+}
