@@ -1,0 +1,59 @@
+package com.ecommerce.utils;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.WebDriverListener;
+
+public class EventHandler implements WebDriverListener {
+    
+    @Override
+    public void beforeGet(WebDriver driver, String url) {
+        LoggerHandler.info("Navigating to URL: " + url);
+    }
+    
+    @Override
+    public void afterGet(WebDriver driver, String url) {
+        LoggerHandler.info("Successfully navigated to: " + url);
+    }
+
+    @Override
+    public void beforeClick(WebElement element) {
+        LoggerHandler.info("Clicking on element: " + element.toString());
+    }
+
+    @Override
+    public void afterClick(WebElement element) {
+        LoggerHandler.info("Clicked successfully");
+    }
+
+    @Override
+    public void beforeSendKeys(WebElement element, CharSequence... keysToSend) {
+        LoggerHandler.info("Typing into element: " + element.toString());
+    }
+
+    @Override
+    public void afterSendKeys(WebElement element, CharSequence... keysToSend) {
+        LoggerHandler.info("Text entered successfully");
+    }
+
+    @Override
+    public void beforeFindElement(WebDriver driver, By locator) {
+        LoggerHandler.info("Finding element: " + locator.toString());
+    }
+
+    @Override
+    public void afterFindElement(WebDriver driver, By locator, WebElement result) {
+        LoggerHandler.info("Element found: " + locator.toString());
+    }
+
+    @Override
+    public void beforeQuit(WebDriver driver) {
+        LoggerHandler.info("Closing browser");
+    }
+
+    @Override
+    public void afterQuit(WebDriver driver) {
+        LoggerHandler.info("Browser closed");
+    }
+}
