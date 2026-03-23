@@ -1,0 +1,48 @@
+package com.ecommerce.utils;
+
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+
+public class ExcelReader {
+    
+    public static String[][] getdata(String sheetName) {
+        String[][] data = null;
+
+        try {
+
+            String filePath = PropertyUtils.get("testDataPath");
+            FileInputStream fis = new FileInputStream(filePath);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet sheet = workbook.getSheet(sheetName);
+
+            int rows = sheet.getLastRowNum();
+            int cols = sheet.getRow(0).getLastCellNum();
+            data = new String[rows][cols];
+            DataFormatter formatter = new DataFormatter();
+
+
+            for (int i = 1; i <= rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    data[i - 1][j] = formatter.formatCellValue(
+                            sheet.getRow(i).getCell(j)
+                    );
+                }
+            }
+
+            workbook.close();
+            fis.close();
+
+            LoggerHandler.info("Excel data read from sheet: " + sheetName
+                    + " | Rows: " + rows + " | Cols: " + cols);
+
+        } catch (Exception e) {
+            LoggerHandler.error("ExcelReader FAILED: " + e.getMessage());
+            throw new RuntimeException("Failed to read Excel: " + e.getMessage(), e);
+        }
+
+        return data;
+    }
+}
