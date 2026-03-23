@@ -1,0 +1,107 @@
+package com.ecommerce.runner;
+
+import com.ecommerce.pages.LoginPageActions;
+import com.ecommerce.pages.ProductsPageActions;
+import com.ecommerce.pages.CartPageActions;
+import com.ecommerce.utils.Base;
+import com.ecommerce.utils.Reporter;
+import com.ecommerce.utils.Screenshot;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+public class CartTest extends Base {
+
+    LoginPageActions loginAct;
+    ProductsPageActions productsAct;
+    CartPageActions cartAct;
+
+    @BeforeMethod
+    public void setup() {
+        openBrowser();
+        loginAct = new LoginPageActions(driver);
+        productsAct = new ProductsPageActions(driver);
+        cartAct = new CartPageActions(driver);
+
+       
+        loginAct.login("standard_user", "secret_sauce");
+    }
+
+    @AfterMethod
+    public void teardown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    //  Test 1 — Add Product to Cart
+
+    @Test(priority = 1, description = "Verifying product is added to cart")
+    public void testAddToCart() {
+        Reporter.createTest("testAddToCart");
+        try {
+            productsAct.addToCart();
+
+            Assert.assertTrue(productsAct.isCartBadgeDisplayed(),
+                    "Cart badge is not displayed even after adding product!");
+
+            String count = productsAct.getCartCount();
+            Assert.assertEquals(count, "1", "Cart count mismatched");
+
+            Reporter.pass("Product added to the cart. Cart count: " + count);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testAddToCart");
+            Reporter.fail("Add to cart FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+    
+    //  Test 2 — Verify Cart Count
+    
+    @Test(priority = 2, description = "Verifying cart count after adding products")
+    public void testVerifyCartCount() {
+        Reporter.createTest("testVerifyCartCount");
+        try {
+            productsAct.addToCart();
+            productsAct.clickCartIcon();
+
+            String pageTitle = cartAct.getPageTitle();
+            Assert.assertEquals(pageTitle, "Your Cart", "Cart page title mismatched");
+
+            String itemName = cartAct.getCartItemName();
+            Assert.assertTrue(itemName.contains("Sauce Labs Backpack"),
+                    "Product name mismatched in cart");
+
+            Reporter.pass("Cart verified. Item: " + itemName);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testVerifyCartCount");
+            Reporter.fail("Verify cart FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+    
+    //  Test 3 — Remove Product from Cart
+   
+    @Test(priority = 3, description = "Verifying if the product is removed from the cart")
+    public void testRemoveFromCart() {
+        Reporter.createTest("testRemoveFromCart");
+        try {
+            productsAct.addToCart();
+            productsAct.clickCartIcon();
+            cartAct.clickRemove();
+
+            Assert.assertFalse(cartAct.isCartItemDisplayed(),
+                    "Product still displayed even after removal");
+
+            Reporter.pass("Product removed from cart successfully");
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testRemoveFromCart");
+            Reporter.fail("Remove from cart FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+}
