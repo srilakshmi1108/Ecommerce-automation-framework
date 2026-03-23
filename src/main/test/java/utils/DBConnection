@@ -1,0 +1,51 @@
+package com.ecommerce.utils;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class DBConnection {
+
+    // Single connection instance
+    private static Connection connection = null;
+    public static Connection getConnection() {
+        try {
+            String url      = PropertyUtils.get("db.url");
+            String username = PropertyUtils.get("db.username");
+            String password = PropertyUtils.get("db.password");
+
+            connection = DriverManager.getConnection(url, username, password);
+            LoggerHandler.info("Database connection established: " + url);
+
+        } catch (Exception e) {
+            LoggerHandler.error("DB connection FAILED: " + e.getMessage());
+            throw new RuntimeException("Failed to connect to DB: " + e.getMessage(), e);
+        }
+        return connection;
+    }
+    
+    public static ResultSet executeQuery(Connection connection, String query) {
+        ResultSet rs = null;
+        try {
+            Statement statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            LoggerHandler.info("Query executed: " + query);
+        } catch (Exception e) {
+            LoggerHandler.error("Query FAILED: " + e.getMessage());
+            throw new RuntimeException("Query execution failed: " + e.getMessage(), e);
+        }
+        return rs;
+    }
+    
+    public static void closeConnection(Connection connection) {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                LoggerHandler.info("Database connection closed.");
+            }
+        } catch (Exception e) {
+            LoggerHandler.error("closeConnection FAILED: " + e.getMessage());
+        }
+    }
+}
