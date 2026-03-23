@@ -1,0 +1,13 @@
+package com.ecommerce.uistore;
+
+import org.openqa.selenium.By;
+
+public class CartPageLocator {
+
+    public static By pageTitle = By.className("title");
+    public static By cartItemName = By.className("inventory_item_name");
+    public static By cartItemPrice = By.className("inventory_item_price");
+    public static By removeBtn = By.xpath("//button[@data-test='remove-sauce-labs-backpack']");
+    public static By continueShoppingBtn = By.id("continue-shopping");
+    public static By checkoutBtn = By.id("checkout");
+}
