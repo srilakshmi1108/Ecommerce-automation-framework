@@ -1,0 +1,43 @@
+package com.ecommerce.pages;
+
+import com.ecommerce.utils.WebDriverHelper;
+import com.ecommerce.uistore.LoginPageLocator;
+import org.openqa.selenium.WebDriver;
+
+
+public class LoginPageActions {
+
+    public static WebDriver driver;
+    public WebDriverHelper helper;
+
+    public LoginPageActions(WebDriver driver) {
+        this.driver = driver;
+        helper = new WebDriverHelper(driver);
+    }
+
+    public void typeUsername(String text) {
+        helper.sendKeys(LoginPageLocator.username, text);
+    }
+
+    public void typePassword(String text) {
+        helper.sendKeys(LoginPageLocator.password, text);
+    }
+
+    public void clickLogin() {
+        helper.click(LoginPageLocator.loginBtn);
+    }
+
+    public String getErrorMessage() {
+        return helper.getText(LoginPageLocator.errorMessage);
+    }
+
+    public boolean isErrorDisplayed() {
+        return helper.isDisplayed(LoginPageLocator.errorMessage);
+    }
+
+    public void login(String username, String password) {
+        typeUsername(username);
+        typePassword(password);
+        clickLogin();
+    }
+}
