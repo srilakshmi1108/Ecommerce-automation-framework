@@ -1,0 +1,132 @@
+package com.ecommerce.runner;
+
+import com.ecommerce.pages.LoginPageActions;
+import com.ecommerce.pages.ProductsPageActions;
+import com.ecommerce.utils.Base;
+import com.ecommerce.utils.Reporter;
+import com.ecommerce.utils.Screenshot;
+import com.ecommerce.utils.ExcelReader;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+public class LoginTest extends Base {
+
+    LoginPageActions loginAct;
+    ProductsPageActions productsAct;
+
+    @BeforeMethod
+    public void setup() {
+        openBrowser();
+        loginAct = new LoginPageActions(driver);
+        productsAct = new ProductsPageActions(driver);
+    }
+
+    @AfterMethod
+    public void teardown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    //Test 1 — Valid Login
+    @Test(priority = 1, description = "Verifying login with valid user credentials")
+    public void testValidLogin() {
+        Reporter.createTest("testValidLogin");
+        try {
+            loginAct.typeUsername("standard_user");
+            loginAct.typePassword("secret_sauce");
+            loginAct.clickLogin();
+
+            String title = productsAct.getPageTitle();
+            Assert.assertEquals(title, "Products",
+                    "Page title mismatch after login!");
+
+            Reporter.pass("Valid login successful. Page title: " + title);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testValidLogin");
+            Reporter.fail("Valid login FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    // Test 2 — Invalid Login
+    @Test(priority = 2, description = "Verifying error message with invalid user credentials")
+    public void testInvalidLogin() {
+        Reporter.createTest("testInvalidLogin");
+        try {
+            loginAct.typeUsername("invalid_user");
+            loginAct.typePassword("wrong_password");
+            loginAct.clickLogin();
+
+            Assert.assertTrue(loginAct.isErrorDisplayed(),
+                    "Error message not displayed for invalid login!");
+
+            String errorMsg = loginAct.getErrorMessage();
+            Assert.assertTrue(
+                    errorMsg.contains("Username and password do not match"),
+                    "Unexpected error message: " + errorMsg
+            );
+
+            Reporter.pass("Invalid login shows correct error: " + errorMsg);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testInvalidLogin");
+            Reporter.fail("Invalid login FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    // Test 3 — Empty Fields
+    @Test(priority = 3, description = "Verifying error message with empty user credentials")
+    public void testEmptyFieldsLogin() {
+        Reporter.createTest("testEmptyFieldsLogin");
+        try {
+            loginAct.clickLogin();
+
+            Assert.assertTrue(loginAct.isErrorDisplayed(),
+                    "Error message not displayed for empty fields!");
+
+            String errorMsg = loginAct.getErrorMessage();
+            Assert.assertTrue(
+                    errorMsg.contains("Username is required"),
+                    "Unexpected error message: " + errorMsg
+            );
+
+            Reporter.pass("Empty fields shows correct error: " + errorMsg);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testEmptyFieldsLogin");
+            Reporter.fail("Empty fields FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    // Test 4 — Data Driven Login
+    @DataProvider(name = "loginData")
+    public Object[][] getLoginData() {
+        return ExcelReader.getdata("Login");
+    }
+
+    @Test(priority = 4,
+            dataProvider = "loginData",
+            description = "Data driven login test from Excel")
+    public void testDataDrivenLogin(String username, String password) {
+        Reporter.createTest("testDataDrivenLogin - " + username);
+        try {
+            loginAct.typeUsername(username);
+            loginAct.typePassword(password);
+            loginAct.clickLogin();
+
+            Reporter.pass("Login attempted with: " + username);
+
+        } catch (Exception e) {
+            String screenshot = Screenshot.capture(driver, "testDataDrivenLogin");
+            Reporter.fail("Data driven login FAILED: " + e.getMessage(), screenshot);
+            Assert.fail(e.getMessage());
+        }
+    }
+}
