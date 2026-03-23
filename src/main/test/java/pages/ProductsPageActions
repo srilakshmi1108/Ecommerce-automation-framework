@@ -1,0 +1,52 @@
+package com.ecommerce.pages;
+
+import com.ecommerce.utils.WebDriverHelper;
+import com.ecommerce.uistore.ProductsPageLocator;
+import org.openqa.selenium.WebDriver;
+
+public class ProductsPageActions {
+
+    public static WebDriver driver;
+    public WebDriverHelper helper;
+
+    public ProductsPageActions(WebDriver driver) {
+        this.driver = driver;
+        helper = new WebDriverHelper(driver);
+    }
+
+    public String getPageTitle() {
+        return helper.getText(ProductsPageLocator.pageTitle);
+    }
+
+    public void addToCart() {
+        helper.click(ProductsPageLocator.addToCartBtn);
+    }
+
+    public void removeFromCart() {
+        helper.click(ProductsPageLocator.removeBtn);
+    }
+
+    public String getCartCount() {
+        return helper.getText(ProductsPageLocator.cartBadge);
+    }
+
+    public boolean isCartBadgeDisplayed() {
+        return helper.isDisplayed(ProductsPageLocator.cartBadge);
+    }
+
+    public void clickCartIcon() {
+        helper.click(ProductsPageLocator.cartIcon);
+    }
+
+    public void selectSortOption(String option) {
+        helper.selectDropDown(ProductsPageLocator.sortDropdown, option);
+    }
+
+    public void clickBurgerMenu() {
+        helper.click(ProductsPageLocator.burgerMenu);
+    }
+
+    public void clickLogout() {
+        helper.click(ProductsPageLocator.logoutLink);
+    }
+}
