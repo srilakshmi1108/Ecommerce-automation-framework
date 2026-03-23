@@ -1,0 +1,55 @@
+package com.ecommerce.pages;
+
+import com.ecommerce.utils.WebDriverHelper;
+import com.ecommerce.uistore.CheckoutPageLocator;
+import org.openqa.selenium.WebDriver;
+
+public class CheckoutPageActions {
+
+    public static WebDriver driver;
+    public WebDriverHelper helper;
+
+    public CheckoutPageActions(WebDriver driver) {
+        this.driver = driver;
+        helper = new WebDriverHelper(driver);
+    }
+
+    public void typeFirstName(String text) {
+        helper.sendKeys(CheckoutPageLocator.firstName, text);
+    }
+
+    public void typeLastName(String text) {
+        helper.sendKeys(CheckoutPageLocator.lastName, text);
+    }
+
+    public void typeZipCode(String text) {
+        helper.sendKeys(CheckoutPageLocator.zipCode, text);
+    }
+
+    public void clickContinue() {
+        helper.click(CheckoutPageLocator.continueBtn);
+    }
+
+    public void clickFinish() {
+        helper.click(CheckoutPageLocator.finishBtn);
+    }
+
+    public String getTotalPrice() {
+        return helper.getText(CheckoutPageLocator.totalPrice);
+    }
+    
+    public String getSuccessHeader() {
+        return helper.getText(CheckoutPageLocator.successHeader);
+    }
+    
+    public boolean isOrderSuccessful() {
+        return helper.isDisplayed(CheckoutPageLocator.successHeader);
+    }
+
+    public void fillCheckoutDetails(String firstName, String lastName, String zip) {
+        typeFirstName(firstName);
+        typeLastName(lastName);
+        typeZipCode(zip);
+        clickContinue();
+    }
+}
